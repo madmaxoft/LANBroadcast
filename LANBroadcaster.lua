@@ -8,6 +8,12 @@
 
 
 function Initialize(a_Plugin)
+	local SettingsIni = cIniFile()
+	if not(SettingsIni:ReadFile("settings.ini")) then
+		LOGINFO("LANBroadcaster: ERROR: Could not read settings.ini!")
+		return
+	end
+	
 	-- Open the UDP endpoint:
 	-- Not interested in any callbacks, we're just sending data
 	local Endpoint = cNetwork:CreateUDPEndpoint(0, {})
@@ -27,7 +33,7 @@ function Initialize(a_Plugin)
 		IsScheduled = true
 		-- Schedule the broadcast
 		local Server = cRoot:Get():GetServer()
-		local DatagramData = "[MOTD]" .. Server:GetDescription() .. "[/MOTD][AD]25565[/AD]"
+		local DatagramData = "[MOTD]" .. Server:GetDescription() .. "[/MOTD][AD]" .. SettingsIni:GetValue("Server", "Port") .. "[/AD]"
 		local Task  -- Must be defined before assigning, because the function refers to itself
 		Task = function ()
 			-- Send the datagram:
